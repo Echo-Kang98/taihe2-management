@@ -346,8 +346,7 @@ nav .time{font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums;}
 // ============================================================
 const CONFIG = {
   updateInterval: 10000,   // 行情刷新间隔(ms) - 真实数据10秒刷新
-  agentEndpoint: '/api/futures-spot',   // futures-spot Agent HTTP接口
-  agentWsEndpoint: 'ws://localhost:8080/futures-spot', // futures-spot Agent WebSocket接口
+  agentEndpoint: '/api/chat',   // 工部期货对话Agent HTTP接口
 };
 
 // 期货行情模拟数据
@@ -843,47 +842,31 @@ function escapeHtml(str) {
 // 可配置CONFIG.agentEndpoint
 async function callAgentHttp(payload) {
   try {
-    // Simulate agent response (in production, replace with actual fetch)
-    // const resp = await fetch(CONFIG.agentEndpoint, {
-    //   method:'POST', headers:{'Content-Type':'application/json'},
-    //   body: JSON.stringify(payload)
-    // });
-    // const data = await resp.json();
-    // addChatMsg('agent', data.reply);
-
-    // Simulated response for demo
-    setTimeout(() => {
-      const responses = getSimulatedResponse(payload.message);
-      addChatMsg('agent', responses);
-    }, 800 + Math.random()*600);
+    // Call real 工部Agent via chat bridge
+    const resp = await fetch(CONFIG.agentEndpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: payload.message,
+        request_id: 'msg_' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    if (data.reply) {
+      addChatMsg('agent', data.reply);
+    } else {
+      addChatMsg('agent', '抱歉，暂时无法获取回复，请稍后重试。');
+    }
   } catch(e) {
-    addChatMsg('system', 'Agent通信异常: '+e.message+'\n请检查 futures-spot Agent 服务是否在线。');
+    addChatMsg('system', 'Agent通信异常: '+e.message+'\n请检查工部Agent服务是否在线。');
   }
 }
 
-// WebSocket connection to futures-spot Agent
+// WebSocket connection to futures-spot Agent (legacy - now using HTTP)
 function connectAgentWs() {
   try {
-    // ws = new WebSocket(CONFIG.agentWsEndpoint);
-    // ws.onopen = () => {
-    //   document.getElementById('agent-status').innerHTML = '<span class="status-dot green"></span> 已连接';
-    // };
-    // ws.onmessage = (e) => {
-    //   try {
-    //     const data = JSON.parse(e.data);
-    //     if (data.type === 'chat_reply') addChatMsg('agent', data.reply);
-    //   } catch(e) { addChatMsg('agent', e.data); }
-    // };
-    // ws.onerror = () => {
-    //   document.getElementById('agent-status').innerHTML = '<span class="status-dot red"></span> 连接异常';
-    // };
-    // ws.onclose = () => {
-    //   document.getElementById('agent-status').innerHTML = '<span class="status-dot yellow"></span> 断线重连中...';
-    //   setTimeout(connectAgentWs, 5000);
-    // };
-
-    // For demo: show as connected with simulated WS
-    document.getElementById('agent-status').innerHTML = '<span class="status-dot green"></span> 已连接(模拟)';
+    // Update status to show connected to real agent
+    document.getElementById('agent-status').innerHTML = '<span class="status-dot green"></span> 已连接';
   } catch(e) {
     document.getElementById('agent-status').innerHTML = '<span class="status-dot red"></span> 未连接';
   }
