@@ -403,14 +403,14 @@ const TAIHE2_API = {
 
   // ==================== 行情数据 ====================
   MARKET_DATA: [
-    { sym: 'WTI', price: 78.45, change: +0.32, changePct: +0.41 },
-    { sym: 'SC2405', price: 624.8, change: -2.1, changePct: -0.34 },
-    { sym: 'BRENT', price: 82.17, change: +0.28, changePct: +0.34 },
+    { sym: 'WTI', price: 100.12, change: 0, changePct: 0 },
+    { sym: 'SC主连', price: 687.4, change: -8.4, changePct: -1.21 },
+    { sym: '布伦特', price: 101.16, change: 0, changePct: 0 },
     { sym: 'USD/CNH', price: 7.2512, change: +0.0123, changePct: +0.17 },
     { sym: 'EUR/USD', price: 1.0782, change: -0.0012, changePct: -0.11 },
-    { sym: '0#柴油', price: 7850, change: +30, changePct: +0.38 },
-    { sym: '92#汽油', price: 8950, change: +25, changePct: +0.28 },
-    { sym: '原油(USD)', price: 82.3, change: +0.45, changePct: +0.55 },
+    { sym: '低硫燃油', price: 4967, change: -64, changePct: -1.27 },
+    { sym: '沥青', price: 4376, change: -56, changePct: -1.26 },
+    { sym: '原油(USD)', price: 101.16, change: 0, changePct: 0 },
   ],
 
   // ==================== Skills 仓库元数据 ====================

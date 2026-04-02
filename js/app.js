@@ -15,10 +15,37 @@
   updateClock();
 
   // 行情滚动条
-  function initTicker() {
+  let marketDataCache = [];
+
+async function fetchRealMarketData() {
+  try {
+    const resp = await fetch('/api/futures');
+    const result = await resp.json();
+    if (result.data && result.data.length > 0) {
+      // Map API data to ticker format
+      marketDataCache = result.data.map(item => ({
+        sym: item.name.replace('主连', ''),
+        price: item.price,
+        change: item.change,
+        changePct: item.changePct
+      }));
+      // Add USD/CNH if not in API
+      if (!marketDataCache.find(m => m.sym === 'USD/CNH')) {
+        marketDataCache.push({ sym: 'USD/CNH', price: 7.2512, change: +0.0123, changePct: +0.17 });
+      }
+      if (!marketDataCache.find(m => m.sym === 'EUR/USD')) {
+        marketDataCache.push({ sym: 'EUR/USD', price: 1.0782, change: -0.0012, changePct: -0.11 });
+      }
+    }
+  } catch (e) {
+    console.log('Fetch market data failed, using cache:', e.message);
+  }
+}
+
+function initTicker() {
     const ticker = document.getElementById('ticker');
     if (!ticker) return;
-    const data = TAIHE2_DATA.MARKET_DATA;
+    const data = marketDataCache.length > 0 ? marketDataCache : TAIHE2_DATA.MARKET_DATA;
     let html = '';
     // 复制两份实现无缝滚动
     for (let i = 0; i < 2; i++) {
@@ -29,6 +56,13 @@
       });
     }
     ticker.innerHTML = html;
+  }
+
+  // Update ticker periodically
+  function startTickerUpdates() {
+    fetchRealMarketData();
+    setInterval(fetchRealMarketData, 15000); // Update every 15s
+    setInterval(initTicker, 15000);
   }
 
   // ==================== Tab 切换 ====================
@@ -548,6 +582,7 @@
   // ==================== 初始化 ====================
   async function init() {
     initTicker();
+    startTickerUpdates();
     initTabs();
     renderOverview();
     renderDeptOverview();
