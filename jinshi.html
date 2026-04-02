@@ -352,14 +352,15 @@ const CONFIG = {
 
 // 期货行情模拟数据
 const FUTURES_DATA = [
-  { symbol:'CL', name:'WTI原油', unit:'美元/桶', contract:'CLmain', price:78.45, change:1.23, changePct:1.59, bid:78.44, ask:78.46, volume:245000, openInterest:1850000, venue:'NYMEX' },
-  { symbol:'BZ', name:'布伦特原油', unit:'美元/桶', contract:'BZmain', price:82.17, change:0.89, changePct:1.09, bid:82.16, ask:82.18, volume:312000, openInterest:2100000, venue:'ICE' },
-  { symbol:'DU', name:'迪拜原油', unit:'美元/桶', contract:'DUmain', price:80.33, change:-0.45, changePct:-0.56, bid:80.32, ask:80.34, volume:128000, openInterest:950000, venue:'DME' },
-  { symbol:'SC', name:'INE原油', unit:'人民币/桶', contract:'SCmain', price:585.2, change:8.5, changePct:1.47, bid:585.1, ask:585.3, volume:85600, openInterest:680000, venue:'INE' },
-  { symbol:'NG', name:'天然气', unit:'美元/MMBtu', contract:'NGmain', price:2.156, change:-0.034, changePct:-1.55, bid:2.155, ask:2.157, volume:198000, openInterest:1200000, venue:'NYMEX' },
-  { symbol:'HO', name:'燃料油', unit:'美元/吨', contract:'HOmain', price:658.5, change:4.2, changePct:0.64, bid:658.4, ask:658.6, volume:45000, openInterest:320000, venue:'ICE' },
-  { symbol:'FU', name:'沥青', unit:'人民币/吨', contract:'FUmain', price:3680, change:-25, changePct:-0.68, bid:3679, ask:3681, volume:78000, openInterest:560000, venue:'SHFE' },
-  { symbol:'PP', name:'聚丙烯', unit:'人民币/吨', contract:'PPmain', price:7650, change:45, changePct:0.59, bid:7649, ask:7651, volume:92000, openInterest:720000, venue:'DCE' },
+  { symbol:'CL', name:'WTI原油', unit:'美元/桶', contract:'CLmain', price:100.12, change:0, changePct:0, bid:100.11, ask:100.13, volume:0, openInterest:0, venue:'NYMEX' },
+  { symbol:'BZ', name:'布伦特原油', unit:'美元/桶', contract:'BZmain', price:101.16, change:0, changePct:0, bid:101.15, ask:101.17, volume:0, openInterest:0, venue:'ICE' },
+  { symbol:'SC', name:'INE原油', unit:'人民币/桶', contract:'SCmain', price:687.4, change:-8.4, changePct:-1.21, bid:687.39, ask:687.41, volume:0, openInterest:0, venue:'INE' },
+  { symbol:'LU', name:'低硫燃油', unit:'人民币/吨', contract:'LUmain', price:4967, change:-64, changePct:-1.27, bid:4966.99, ask:4967.01, volume:0, openInterest:0, venue:'INE' },
+  { symbol:'BU', name:'沥青', unit:'人民币/吨', contract:'BUmain', price:4376, change:-56, changePct:-1.26, bid:4375.99, ask:4376.01, volume:0, openInterest:0, venue:'SHFE' },
+  { symbol:'FU', name:'燃油', unit:'人民币/吨', contract:'FUmain', price:4212, change:-19, changePct:-0.45, bid:4211.99, ask:4212.01, volume:0, openInterest:0, venue:'SHFE' },
+  { symbol:'PL', name:'丙烯', unit:'人民币/吨', contract:'PLmain', price:8751, change:32, changePct:0.37, bid:8750.99, ask:8751.01, volume:0, openInterest:0, venue:'CZC' },
+  { symbol:'EB', name:'苯乙烯', unit:'人民币/吨', contract:'EBmain', price:10131, change:-157, changePct:-1.53, bid:10130.99, ask:10131.01, volume:0, openInterest:0, venue:'DCE' },
+  { symbol:'PP', name:'聚丙烯', unit:'人民币/吨', contract:'PPmain', price:9035, change:20, changePct:0.22, bid:9034.99, ask:9035.01, volume:0, openInterest:0, venue:'DCE' },
 ];
 
 // 敞口数据
@@ -503,9 +504,15 @@ function renderQuoteTable(data) {
 
 // Mapping from API symbols to page symbols
 const SYMBOL_MAP = {
-  'BRN0W': 'BZ',  // 布伦特原油周合约 -> BZ
-  'BRN0F': 'BZ',  // 布伦特首月 -> BZ
-  'BRN0M': 'BZ',  // 布伦特次月 -> BZ
+  'BRN0W': 'BZ',  // 布伦特原油 -> BZ
+  '@CL0W': 'CL',  // 美原油 -> CL
+  'PLZL': 'PL',   // 丙烯 -> PL
+  'EBZL': 'EB',   // 苯乙烯 -> EB
+  'PPZL': 'PP',   // 聚丙烯 -> PP
+  'SCZL': 'SC',   // INE原油 -> SC
+  'LUZL': 'LU',   // 低硫燃油 -> LU
+  'BUZL': 'BU',   // 沥青 -> BU
+  'FUZL': 'FU',   // 燃油 -> FU
 };
 
 async function fetchRealQuotes() {
