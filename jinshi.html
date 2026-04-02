@@ -345,7 +345,7 @@ nav .time{font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums;}
 // 可扩展：替换为真实Wind/路透/交易所数据源
 // ============================================================
 const CONFIG = {
-  updateInterval: 3000,   // 行情刷新间隔(ms)
+  updateInterval: 10000,   // 行情刷新间隔(ms) - 真实数据10秒刷新
   agentEndpoint: '/api/futures-spot',   // futures-spot Agent HTTP接口
   agentWsEndpoint: 'ws://localhost:8080/futures-spot', // futures-spot Agent WebSocket接口
 };
@@ -501,7 +501,44 @@ function renderQuoteTable(data) {
   }).join('');
 }
 
-function refreshQuotes() {
+// Mapping from API symbols to page symbols
+const SYMBOL_MAP = {
+  'BRN0W': 'BZ',  // 布伦特原油周合约 -> BZ
+  'BRN0F': 'BZ',  // 布伦特首月 -> BZ
+  'BRN0M': 'BZ',  // 布伦特次月 -> BZ
+};
+
+async function fetchRealQuotes() {
+  try {
+    const resp = await fetch('/api/futures');
+    const result = await resp.json();
+    if (result.data && result.data.length > 0) {
+      // Update FUTURES_DATA with real data
+      result.data.forEach(apiItem => {
+        // Map API symbol to page symbol
+        const mappedSymbol = SYMBOL_MAP[apiItem.symbol] || apiItem.symbol;
+        const existing = FUTURES_DATA.find(f => f.symbol === mappedSymbol);
+        if (existing && apiItem.price > 0) {
+          existing.price = apiItem.price || existing.price;
+          existing.change = apiItem.change || 0;
+          existing.changePct = apiItem.changePct || 0;
+          existing.high = apiItem.high || existing.high;
+          existing.low = apiItem.low || existing.low;
+          existing.volume = apiItem.volume || existing.volume;
+          existing.bid = apiItem.bid || existing.bid;
+          existing.ask = apiItem.ask || existing.ask;
+        }
+      });
+      renderQuoteTable(FUTURES_DATA);
+      updateTicker();
+    }
+  } catch (e) {
+    console.log('Fetch error, using simulation:', e.message);
+    refreshQuotesSimulated();
+  }
+}
+
+function refreshQuotesSimulated() {
   // Simulate price fluctuation
   FUTURES_DATA.forEach(f => {
     const delta = (Math.random() - 0.5) * 0.4;
@@ -514,6 +551,11 @@ function refreshQuotes() {
   });
   renderQuoteTable(FUTURES_DATA);
   updateTicker();
+}
+
+function refreshQuotes() {
+  // Try real API first, fallback to simulation
+  fetchRealQuotes();
 }
 
 function updateTicker() {
